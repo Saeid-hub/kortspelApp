@@ -11,7 +11,7 @@ import kotlin.random.Random
 
 class GameActivity : AppCompatActivity() {
     private var score = 0
-    private var currentCard = Random.nextInt(1, 14) // Slumpmässigt kort mellan 1 och 13
+    private var currentCard = Random.nextInt(1, 12) // Slumpmässigt kort mellan 1 och 13
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,36 +26,38 @@ class GameActivity : AppCompatActivity() {
 
         // Hantera klick för Higher-knappen
         higherButton.setOnClickListener {
-            val isCorrect = checkGuess(true) // Kontrollera om gissningen var korrekt
-            updateUI(cardImage, scoreText) // Uppdatera kortbild och poängtext
+            val isCorrect = checkGuess(true, cardImage) // Kontrollera om gissningen var korrekt
+            updateUI(scoreText) // Uppdatera kortbild och poängtext
             showResultPopup(isCorrect) // Visa popup baserat på resultat
         }
 
         // Hantera klick för Lower-knappen
         lowerButton.setOnClickListener {
-            val isCorrect = checkGuess(false) // Kontrollera om gissningen var korrekt
-            updateUI(cardImage, scoreText) // Uppdatera kortbild och poängtext
+            val isCorrect = checkGuess(false, cardImage) // Kontrollera om gissningen var korrekt
+            updateUI(scoreText) // Uppdatera kortbild och poängtext
             showResultPopup(isCorrect) // Visa popup baserat på resultat
         }
     }
 
     // Kontrollera om gissningen var korrekt och returnera resultatet
-    private fun checkGuess(isHigher: Boolean): Boolean {
-        val newCard = Random.nextInt(1, 14) // Dra ett nytt kort
-        val isCorrect = (isHigher && newCard > currentCard) || (!isHigher && newCard < currentCard) // Kontrollera korrekthet
+    private fun checkGuess(isHigher: Boolean, cardImage: ImageView): Boolean {
+        val newCard = Random.nextInt(1, 12) // Dra ett nytt kort
+        val isCorrect = (isHigher && newCard > currentCard) || (!isHigher && newCard < currentCard) // Kontrollera gissningen
+
+        // Uppdatera UI med det nya kortet
+        currentCard = newCard
+        updateCardImage(cardImage, currentCard) // Visa nya kortet
 
         if (isCorrect) {
-            score++ // Öka poängen om korrekt
+            score++ // Öka poängen om gissningen var korrekt
         }
-
-        currentCard = newCard // Uppdatera currentCard med det nya kortet
-        return isCorrect
+        return isCorrect // Returnera om gissningen var rätt
     }
 
     // Uppdatera kortbild och poängtext
-    private fun updateUI(cardImage: ImageView, scoreText: TextView) {
+    private fun updateUI(scoreText: TextView) {
         scoreText.text = "Poäng: $score"
-        updateCardImage(cardImage, currentCard)
+
 
         if (score >= 10) { // Om poäng når 10, gå till GameOverActivity
             val intent = Intent(this, GameOverActivity::class.java)
@@ -87,7 +89,7 @@ class GameActivity : AppCompatActivity() {
     // Uppdatera kortets bild
     private fun updateCardImage(cardImage: ImageView, cardValue: Int) {
         val cardResId = resources.getIdentifier("card_$cardValue", "drawable", packageName)
-        cardImage.setImageResource(R.drawable.seven_card)
+        cardImage.setImageResource(cardResId)
     }
 }
 
